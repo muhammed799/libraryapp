@@ -1,53 +1,87 @@
 const express = require('express');
 const bookhandler = express.Router();
+const bookdata = require("../model/bookmodel")
 
 
 
-var books = [
-    {
-        title: 'Tom and Jerry',
-        author: 'Joseph Barbera',
-        genre: 'Cartoon',
-        img: 'tom.jpg'
-    },
-    {
-        title: 'Lord of Rings',
-        author: 'J.R.R Tolkien',
-        genre: 'Fantacy',
-        img: 'lord.jpg'
-    },
-    {
-        title: 'War and Peace',
-        author: 'Leo Tolstoy',
-        genre: 'War',
-        img: 'image.jpg'
-    }
-];
+// var books = [
+//     {
+//         title: 'Tom and Jerry',
+//         author: 'Joseph Barbera',
+//         genre: 'Cartoon',
+//         img: 'tom.jpg'
+//     },
+//     {
+//         title: 'Lord of Rings',
+//         author: 'J.R.R Tolkien',
+//         genre: 'Fantacy',
+//         img: 'lord.jpg'
+//     },
+//     {
+//         title: 'War and Peace',
+//         author: 'Leo Tolstoy',
+//         genre: 'War',
+//         img: 'image.jpg'
+//     }
+// ];
 function router(nav) {
     // handling books link
     bookhandler
         .route('/')
         .get((req, res) => {
-            res.render('books',
-                {
-                    nav,
-                    books
-                }
-            );
-            res.end();
+            bookdata.find()
+                .then(function (books) {
+                    // console.log(books)
+                    //res.header('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0');
+                    res.render('books',
+                        {
+                            nav,
+                            books
+                        }
+                    );
+                    
+
+                })
+        
+
+
         })
     // handling url when id comes after /books ie,/books/id
     bookhandler
         .route('/:id')
         .get((req, res) => {
             const id = req.params.id;
-            res.render('book',
+            bookdata.findOne({_id : id})
+            .then(function(book){
+                res.render('book',
                 {
                     nav,
-                    book: books[id]
+                    book
                 });
             res.end();
+
+            })
+
         })
+    bookhandler
+        .route('/delete')
+        .post((req, res) => {
+            const id = req.query.bookid;
+            bookdata.findOneAndRemove({_id : id},(err) => {
+                     if(err){
+                        res.send({
+                            msg:err
+                        })
+                     }
+                     else {
+                        //  res.send({
+                        //      msg:'success deleted'
+                        //  })
+                     }
+                    
+                    
+                 });
+        });
 
     return bookhandler;
 
