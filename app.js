@@ -2,7 +2,7 @@
 const express = require('express');
 const app = new express();
 const upload = require('express-fileupload');
-
+const port = process.env.PORT || 2000;
 
 
 
@@ -72,6 +72,6 @@ app.get('/home',(req,res)=>{
     res.end();
 })
 
-app.listen(5000 ,()=>{
-    console.log("[info]:listening at port 5000");
+app.listen(port ,()=>{
+    console.log("[info]:listening at port "+port);
 });
